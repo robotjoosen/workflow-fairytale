@@ -24,6 +24,9 @@ class TrainTaskWorkflowSubscriber implements EventSubscriberInterface
         $hero->decreaseIntelligence();
     }
 
+    /**
+     * @return string[]
+     */
     public static function getSubscribedEvents(): array
     {
         return [

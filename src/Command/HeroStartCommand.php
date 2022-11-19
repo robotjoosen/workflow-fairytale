@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\UnicodeString;
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
 
@@ -64,6 +65,9 @@ class HeroStartCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @note pick uncompleted quests and handle its tasks
+     */
     private function handleUncompletedQuests(Hero $hero): void
     {
         $uncompletedQuests = $this->questRepository->findWithUncompletedTasks($hero);
@@ -82,7 +86,7 @@ class HeroStartCommand extends Command
             $this->io->section('Time get started with your quest');
             $tasks = $this->taskRepository->findUncompletedTaskByQuest($quest);
             foreach ($tasks as $task) {
-                $this->io->title(sprintf('Your started to %s', $task));
+                $this->io->title(sprintf('You started: %s', $task));
                 $this->handleTask($task);
 
                 $this->io->info('Your progress');
@@ -94,12 +98,18 @@ class HeroStartCommand extends Command
     }
 
     /**
-     * @note loop through all the places of a workflow
+     * @note interactively move task through workflow
      */
     private function handleTask(Task $task): void
     {
         while (!in_array($task->getState(), ['completed', 'failed'])) {
-            $workflow = $this->workflowRegistry->get($task, $task->getName());
+            try {
+                $workflow = $this->workflowRegistry->get($task, $task->getWorkflow());
+            } catch (InvalidArgumentException $exception) {
+                $this->io->warning($exception->getMessage());
+
+                exit;
+            }
 
             $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
 
@@ -162,7 +172,7 @@ class HeroStartCommand extends Command
             $name = new UnicodeString($transition->getName());
             $transitionChoices = [$name->replace('_', ' ')->title(), ...$transitionChoices];
         }
-        $selectedTransition = $this->io->choice('What is next?', $transitionChoices);
+        $selectedTransition = $this->io->choice('What do you do?', $transitionChoices);
         $selectedTransition = new UnicodeString($selectedTransition);
 
         return $selectedTransition->lower()->snake();

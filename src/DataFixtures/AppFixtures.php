@@ -31,14 +31,14 @@ class AppFixtures extends Fixture
         $hero = $this->createHero('Smashers Inc.', 'Warrior', $statsModel);
 
         $quest1 = $this->createQuest($hero, 'The beginning', 'A hero is born', 10);
-        $quest1->addTask($this->createTask('train', 10));
-        $quest1->addTask($this->createTask('wander', 20));
+        $quest1->addTask($this->createTask('First training', 'train', 10));
+        $quest1->addTask($this->createTask('Soul searching', 'wander', 20));
 
         $quest2 = $this->createQuest($hero, 'Not again', 'Already tired from the first one', 20);
-        $quest2->addTask($this->createTask('train', 10));
-        $quest2->addTask($this->createTask('wander', 20));
-        $quest2->addTask($this->createTask('train', 30));
-        $quest2->addTask($this->createTask('slay_dragon', 40));
+        $quest2->addTask($this->createTask('More training', 'train', 10));
+        $quest2->addTask($this->createTask('Walk around', 'wander', 20));
+        $quest2->addTask($this->createTask('Kick Ass', 'train', 30));
+        $quest2->addTask($this->createTask('Slay Dragon', 'slay_dragon', 40));
     }
 
     private function createSecondHero(): void
@@ -47,9 +47,9 @@ class AppFixtures extends Fixture
         $hero = $this->createHero('The grey mass', 'Writer', $statsModel);
 
         $quest2 = $this->createQuest($hero, 'The accident', 'Stumbled on something unpleasant', 20);
-        $quest2->addTask($this->createTask('wander', 10));
-        $quest2->addTask($this->createTask('wander', 20));
-        $quest2->addTask($this->createTask('slay_dragon', 30));
+        $quest2->addTask($this->createTask('Search', 'wander', 10));
+        $quest2->addTask($this->createTask('Search', 'wander', 20));
+        $quest2->addTask($this->createTask('Search some more', 'slay_dragon', 30));
     }
 
     private function createHero(string $name, string $type, HeroStats $stats): Hero
@@ -81,11 +81,12 @@ class AppFixtures extends Fixture
         return $quest;
     }
 
-    private function createTask(string $name, int $ordinality = 0): Task
+    private function createTask(string $name, string $workflow, int $ordinality = 0): Task
     {
         $task = new Task();
         $task->setName($name);
         $task->setOrdinality($ordinality);
+        $task->setWorkflow($workflow);
 
         $this->manager->persist($task);
 

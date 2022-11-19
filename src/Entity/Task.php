@@ -26,6 +26,9 @@ class Task
     #[ORM\Column(options: ['default' => 0])]
     private int $ordinality = 0;
 
+    #[ORM\Column(length: 255)]
+    private ?string $workflow = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +72,18 @@ class Task
     public function setOrdinality(int $ordinality): void
     {
         $this->ordinality = $ordinality;
+    }
+
+    public function getWorkflow(): ?string
+    {
+        return $this->workflow;
+    }
+
+    public function setWorkflow(string $workflow): self
+    {
+        $this->workflow = $workflow;
+
+        return $this;
     }
 
     public function __toString(): string

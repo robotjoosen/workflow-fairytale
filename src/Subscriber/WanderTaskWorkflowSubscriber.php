@@ -23,6 +23,9 @@ class WanderTaskWorkflowSubscriber implements EventSubscriberInterface
         $hero->decreaseStrength();
     }
 
+    /**
+     * @return string[]
+     */
     public static function getSubscribedEvents(): array
     {
         return [
