@@ -81,14 +81,13 @@ class HeroStartCommand extends Command
             $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
 
             $selectedTransition = $this->selectTransition($workflow->getEnabledTransitions($task));
-
             if ($selectedTransition === 'quit') {
                 $this->io->warning('Goodbye, see you next time!');
 
                 exit;
             }
 
-            $workflow->apply($task, $selectedTransition ?? (reset($transitions))->getName());
+            $workflow->apply($task, $selectedTransition);
             $this->entityManager->flush();
 
             $this->io->comment(sprintf('you just performed %s', $selectedTransition));
