@@ -21,15 +21,15 @@ class AppFixtures extends Fixture
 
         $hero = $this->createHero('Hiro', 'Warrior', $statsModel);
 
-        $quest1 = $this->createQuest($hero, 'The beginning', 'A hero is born', 20);
+        $quest1 = $this->createQuest($hero, 'The beginning', 'A hero is born', 10);
         $quest1->addTask($this->createTask('train', 10));
         $quest1->addTask($this->createTask('wander', 20));
 
-        $quest2 = $this->createQuest($hero, 'Not again', 'Already tired from the first one', 10);
+        $quest2 = $this->createQuest($hero, 'Not again', 'Already tired from the first one', 20);
         $quest2->addTask($this->createTask('train', 10));
-        $quest2->addTask($this->createTask('wander', 5));
-        $quest2->addTask($this->createTask('train', 20));
-        $quest2->addTask($this->createTask('slay_dragon', 30));
+        $quest2->addTask($this->createTask('wander', 20));
+        $quest2->addTask($this->createTask('train', 30));
+        $quest2->addTask($this->createTask('slay_dragon', 40));
 
         $manager->flush();
     }
