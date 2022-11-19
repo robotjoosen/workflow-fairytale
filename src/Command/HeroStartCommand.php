@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Transition;
 
 #[AsCommand(
     name: 'hero:start',
@@ -76,25 +77,18 @@ class HeroStartCommand extends Command
     {
         while (!in_array($task->getState(), ['completed', 'failed'])) {
             $workflow = $this->workflowRegistry->get($task, $task->getName());
-            $transitions = $workflow->getEnabledTransitions($task);
 
             $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
 
-            $transitionChoices = ['Quit'];
-            foreach ($transitions as $transition) {
-                $name = new UnicodeString($transition->getName());
-                $transitionChoices = [$name->replace('_', ' ')->title(), ...$transitionChoices];
-            }
-            $selectedTransition = $this->io->choice('What is next?', $transitionChoices);
+            $selectedTransition = $this->selectTransition($workflow->getEnabledTransitions($task));
 
-            if ($selectedTransition === 'Quit') {
+            if ($selectedTransition === 'quit') {
                 $this->io->warning('Goodbye, see you next time!');
 
                 exit;
             }
 
-            $selectedTransition = new UnicodeString($selectedTransition);
-            $workflow->apply($task, $selectedTransition->lower()->snake() ?? (reset($transitions))->getName());
+            $workflow->apply($task, $selectedTransition ?? (reset($transitions))->getName());
             $this->entityManager->flush();
 
             $this->io->comment(sprintf('you just performed %s', $selectedTransition));
@@ -131,5 +125,21 @@ class HeroStartCommand extends Command
                 ['Charisma', $hero->getCharisma()],
             ]
         );
+    }
+
+    /**
+     * @param Transition[] $transitions
+     */
+    private function selectTransition(array $transitions): string
+    {
+        $transitionChoices = ['Quit'];
+        foreach ($transitions as $transition) {
+            $name = new UnicodeString($transition->getName());
+            $transitionChoices = [$name->replace('_', ' ')->title(), ...$transitionChoices];
+        }
+        $selectedTransition = $this->io->choice('What is next?', $transitionChoices);
+        $selectedTransition = new UnicodeString($selectedTransition);
+
+        return $selectedTransition->lower()->snake();
     }
 }
