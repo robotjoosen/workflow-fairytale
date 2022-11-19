@@ -1,0 +1,92 @@
+framework:
+    workflows:
+        train:
+            type: state_machine
+            marking_store:
+                type: method
+                property: state
+            initial_marking: new
+            supports:
+                - App\Entity\Task
+            places:
+                - new
+                - started
+                - training
+                - completed
+            transitions:
+                begin:
+                    from: new
+                    to: started
+                train:
+                    from: started
+                    to: training
+                finish:
+                    from: training
+                    to: completed
+
+        wander:
+            type: state_machine
+            marking_store:
+                type: method
+                property: state
+            initial_marking: new
+            supports:
+                - App\Entity\Task
+            places:
+                - new
+                - started
+                - traveling
+                - completed
+            transitions:
+                begin:
+                    from: new
+                    to: started
+                travel:
+                    from: started
+                    to: traveling
+                homeward:
+                    from: traveling
+                    to: completed
+
+        slay_dragon:
+            type: state_machine
+            marking_store:
+                type: method
+                property: state
+            initial_marking: new
+            supports:
+                - App\Entity\Task
+            places:
+                - new
+                - started
+                - traveling
+                - slaying
+                - victorious
+                - dead
+                - completed
+                - failed
+            transitions:
+                begin:
+                    from: new
+                    to: started
+                travel:
+                    from: started
+                    to: traveling
+                slay:
+                    from: traveling
+                    to: slaying
+                win:
+                    from: slaying
+                    to: victorious
+                lose:
+                    from: slaying
+                    to: dead
+                fail:
+                    from: dead
+                    to: failed
+                complete:
+                    from: victorious
+                    to: completed
+
+
+
