@@ -28,6 +28,9 @@ framework:
                 train:
                     from: started
                     to: training
+                train_more:
+                    from: training
+                    to: training
                 finish:
                     from: training
                     to: completed
@@ -57,8 +60,11 @@ framework:
                 begin:
                     from: new
                     to: started
-                travel:
+                wander:
                     from: started
+                    to: traveling
+                wander_more:
+                    from: traveling
                     to: traveling
                 homeward:
                     from: traveling

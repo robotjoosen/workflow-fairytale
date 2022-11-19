@@ -73,6 +73,6 @@ class Task
 
     public function __toString(): string
     {
-        return sprintf('%s - %s', $this->getName(), $this->getState());
+        return $this->getName();
     }
 }

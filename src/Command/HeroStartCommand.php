@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\Hero;
 use App\Entity\Task;
 use App\Repository\HeroRepository;
 use App\Repository\QuestRepository;
@@ -10,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Workflow\Registry;
@@ -35,21 +37,35 @@ class HeroStartCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$output instanceof ConsoleOutputInterface) {
+            throw new \LogicException('This command accepts only an instance of "ConsoleOutputInterface".');
+        }
+
         $this->io = new SymfonyStyle($input, $output);
 
+        $this->io->section('Choose your hero');
         $hero = $this->io->choice('select your hero', $this->heroRepository->findAll());
         $this->io->info('You have just selected: ' . $hero);
 
+        $this->io->section('Pick a quest');
         $quest = $this->io->choice('Select your quest!', $this->questRepository->findWithUncompletedTasks());
         $this->io->info('You have just selected: ' . $quest);
 
-        $this->io->note('Current state of your journey');
+        $this->io->section('Current state of your journey');
+        $this->io->title($hero->getName() . '\'s stats');
+        $this->tablelizeHeroStats($hero);
+
+        $this->io->title('Tasks');
         $this->tablelizeCurrentStateOfTasks($quest->getTasks());
 
+        $this->io->section('Time get started with your quest');
         $tasks = $this->taskRepository->findUncompletedTaskByQuest($quest);
         foreach ($tasks as $task) {
-            $this->io->info(sprintf('Your started the %s task', $task));
+            $this->io->title(sprintf('Your started to %s', $task));
             $this->handleTask($task);
+
+            $this->io->info('Your progress');
+            $this->tablelizeHeroStats($hero);
         }
 
         return Command::SUCCESS;
@@ -61,11 +77,7 @@ class HeroStartCommand extends Command
             $workflow = $this->workflowRegistry->get($task, $task->getName());
             $transitions = $workflow->getEnabledTransitions($task);
 
-            $this->io->block(
-                $workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story'],
-                'Story',
-                'info',
-            );
+            $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
 
             $transitionChoices = ['quit'];
             foreach ($transitions as $transition) {
@@ -102,5 +114,19 @@ class HeroStartCommand extends Command
             ];
         }
         $this->io->table(['name', 'state', 'ordinality'], $tableRows);
+    }
+
+    private function tablelizeHeroStats(Hero $hero): void
+    {
+        $this->io->table(
+            ['Stat', 'Value'],
+            [
+                ['Strength', $hero->getStrength()],
+                ['Stamina', $hero->getStamina()],
+                ['Intelligence', $hero->getIntelligence()],
+                ['Dexterity', $hero->getDexterity()],
+                ['Charisma', $hero->getCharisma()],
+            ]
+        );
     }
 }
