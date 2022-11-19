@@ -17,9 +17,18 @@ class AppFixtures extends Fixture
     {
         $this->manager = $manager;
 
-        $statsModel = new HeroStats(8, 4, 7, 5, 8);
+        $this->createFirstHero();
+        $this->createSecondHero();
 
-        $hero = $this->createHero('Hiro', 'Warrior', $statsModel);
+
+
+        $manager->flush();
+    }
+
+    private function createFirstHero(): void
+    {
+        $statsModel = new HeroStats(80, 40, 70, 50, 80);
+        $hero = $this->createHero('Smashers Inc.', 'Warrior', $statsModel);
 
         $quest1 = $this->createQuest($hero, 'The beginning', 'A hero is born', 10);
         $quest1->addTask($this->createTask('train', 10));
@@ -30,8 +39,17 @@ class AppFixtures extends Fixture
         $quest2->addTask($this->createTask('wander', 20));
         $quest2->addTask($this->createTask('train', 30));
         $quest2->addTask($this->createTask('slay_dragon', 40));
+    }
 
-        $manager->flush();
+    private function createSecondHero(): void
+    {
+        $statsModel = new HeroStats(20, 75, 10, 100, 50);
+        $hero = $this->createHero('The grey mass', 'Writer', $statsModel);
+
+        $quest2 = $this->createQuest($hero, 'The accident', 'Stumbled on something unpleasant', 20);
+        $quest2->addTask($this->createTask('wander', 10));
+        $quest2->addTask($this->createTask('wander', 20));
+        $quest2->addTask($this->createTask('slay_dragon', 30));
     }
 
     private function createHero(string $name, string $type, HeroStats $stats): Hero
