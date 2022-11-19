@@ -44,11 +44,9 @@ class Hero
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
 
     public function getType(): ?string
@@ -56,11 +54,9 @@ class Hero
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(string $type): void
     {
         $this->type = $type;
-
-        return $this;
     }
 
     public function getStrength(): ?int
@@ -68,11 +64,19 @@ class Hero
         return $this->strength;
     }
 
-    public function setStrength(int $strength): self
+    public function setStrength(int $strength): void
     {
         $this->strength = $strength;
+    }
 
-        return $this;
+    public function increaseStrength(): void
+    {
+        $this->strength += rand(0, 5);
+    }
+
+    public function decreaseStrength(): void
+    {
+        $this->strength -= rand(0, 5);
     }
 
     public function getStamina(): ?int
@@ -80,11 +84,19 @@ class Hero
         return $this->stamina;
     }
 
-    public function setStamina(int $stamina): self
+    public function setStamina(int $stamina): void
     {
         $this->stamina = $stamina;
+    }
 
-        return $this;
+    public function increaseStamina(): void
+    {
+        $this->stamina += rand(0, 5);
+    }
+
+    public function decreaseStamina(): void
+    {
+        $this->stamina -= rand(0, 5);
     }
 
     public function getDexterity(): ?int
@@ -92,11 +104,19 @@ class Hero
         return $this->dexterity;
     }
 
-    public function setDexterity(int $dexterity): self
+    public function setDexterity(int $dexterity): void
     {
         $this->dexterity = $dexterity;
+    }
 
-        return $this;
+    public function increaseDexterity(): void
+    {
+        $this->dexterity += rand(0, 5);
+    }
+
+    public function decreaseDexterity(): void
+    {
+        $this->dexterity -= rand(0, 5);
     }
 
     public function getIntelligence(): ?int
@@ -104,11 +124,19 @@ class Hero
         return $this->intelligence;
     }
 
-    public function setIntelligence(int $intelligence): self
+    public function setIntelligence(int $intelligence): void
     {
         $this->intelligence = $intelligence;
+    }
 
-        return $this;
+    public function increaseIntelligence(): void
+    {
+        $this->intelligence += rand(0, 5);
+    }
+
+    public function decreaseIntelligence(): void
+    {
+        $this->intelligence -= rand(0, 5);
     }
 
     public function getCharisma(): ?int
@@ -116,11 +144,19 @@ class Hero
         return $this->charisma;
     }
 
-    public function setCharisma(int $charisma): self
+    public function setCharisma(int $charisma): void
     {
         $this->charisma = $charisma;
+    }
 
-        return $this;
+    public function increaseCharisma(): void
+    {
+        $this->charisma += rand(0, 5);
+    }
+
+    public function decreaseCharisma(): void
+    {
+        $this->charisma -= rand(0, 5);
     }
 
     public function __toString(): string
