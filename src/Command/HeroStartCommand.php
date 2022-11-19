@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Workflow\Registry;
 
 #[AsCommand(
@@ -79,19 +80,21 @@ class HeroStartCommand extends Command
 
             $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
 
-            $transitionChoices = ['quit'];
+            $transitionChoices = ['Quit'];
             foreach ($transitions as $transition) {
-                $transitionChoices = [$transition->getName(), ...$transitionChoices];
+                $name = new UnicodeString($transition->getName());
+                $transitionChoices = [$name->replace('_', ' ')->title(), ...$transitionChoices];
             }
             $selectedTransition = $this->io->choice('What is next?', $transitionChoices);
 
-            if ($selectedTransition === 'quit') {
+            if ($selectedTransition === 'Quit') {
                 $this->io->warning('Goodbye, see you next time!');
 
                 exit;
             }
 
-            $workflow->apply($task, $selectedTransition ?? (reset($transitions))->getName());
+            $selectedTransition = new UnicodeString($selectedTransition);
+            $workflow->apply($task, $selectedTransition->lower()->snake() ?? (reset($transitions))->getName());
             $this->entityManager->flush();
 
             $this->io->comment(sprintf('you just performed %s', $selectedTransition));
