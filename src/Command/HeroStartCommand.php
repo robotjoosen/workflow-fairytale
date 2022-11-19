@@ -33,10 +33,6 @@ class HeroStartCommand extends Command
         parent::__construct($name);
     }
 
-    protected function configure(): void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
@@ -64,6 +60,12 @@ class HeroStartCommand extends Command
         while (!in_array($task->getState(), ['completed', 'failed'])) {
             $workflow = $this->workflowRegistry->get($task, $task->getName());
             $transitions = $workflow->getEnabledTransitions($task);
+
+            $this->io->block(
+                $workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story'],
+                'Story',
+                'info',
+            );
 
             $transitionChoices = ['quit'];
             foreach ($transitions as $transition) {

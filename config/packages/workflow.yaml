@@ -9,10 +9,18 @@ framework:
             supports:
                 - App\Entity\Task
             places:
-                - new
-                - started
-                - training
-                - completed
+                new:
+                    metadata:
+                        story: You are weak and need some training
+                started:
+                    metadata:
+                        story: You accepted training, let's get stronger
+                training:
+                    metadata:
+                        story: You are sweating, training is harder than you've expected
+                completed:
+                    metadata:
+                        story: You are done, and promised never to do this again, for now
             transitions:
                 begin:
                     from: new
@@ -33,10 +41,18 @@ framework:
             supports:
                 - App\Entity\Task
             places:
-                - new
-                - started
-                - traveling
-                - completed
+                new:
+                    metadata:
+                        story: You need to stretch your legs
+                started:
+                    metadata:
+                        story: You are going for a walk
+                traveling:
+                    metadata:
+                        story: You're walking, you're walking
+                completed:
+                    metadata:
+                        story: You are finally home
             transitions:
                 begin:
                     from: new
@@ -57,14 +73,30 @@ framework:
             supports:
                 - App\Entity\Task
             places:
-                - new
-                - started
-                - traveling
-                - slaying
-                - victorious
-                - dead
-                - completed
-                - failed
+                new:
+                    metadata:
+                        story: A dragon is wreaking havoc in the lands, this must be stopped
+                started:
+                    metadata:
+                        story: You are getting ready to slay the dragon
+                traveling:
+                    metadata:
+                        story: You are traveling to the dragon
+                slaying:
+                    metadata:
+                        story: You stumbled upon the dragon and are fighting the monstrous beast
+                victorious:
+                    metadata:
+                        story: You slayed the dragon
+                dead:
+                    metadata:
+                        story: You are dead, past your expiration date, you are no more.
+                completed:
+                    metadata:
+                        story: You are a true hero!
+                failed:
+                    metadata:
+                        story: The dragon killed everyone
             transitions:
                 begin:
                     from: new
