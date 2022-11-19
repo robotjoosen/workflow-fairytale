@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Hero;
 use App\Entity\Quest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -32,11 +33,12 @@ class QuestRepository extends ServiceEntityRepository
     /**
      * @return Quest[]
      */
-    public function findWithUncompletedTasks(): array
+    public function findWithUncompletedTasks(Hero $hero): array
     {
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->leftJoin(self::ALIAS . '.tasks', 'task');
         $queryBuilder->andWhere($queryBuilder->expr()->notIn('task.state', ['completed', 'failed']));
+        $queryBuilder->andWhere($queryBuilder->expr()->eq(self::ALIAS . '.hero', $hero->getId()));
         $queryBuilder->orderBy(self::ALIAS . '.ordinality');
 
         return $queryBuilder->getQuery()->getResult();
