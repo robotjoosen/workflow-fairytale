@@ -72,28 +72,22 @@ class HeroStartCommand extends Command
     {
         $uncompletedQuests = $this->questRepository->findWithUncompletedTasks($hero);
         while (!empty($uncompletedQuests)) {
-            $this->io->section('Pick a quest');
-            $quest = $this->io->choice('Select your quest!', $uncompletedQuests);
-            $this->io->info('You have just selected: ' . $quest);
-
-            $this->io->section('Current state of your journey');
-            $this->io->title($hero->getName() . '\'s stats');
-            $this->tablelizeHeroStats($hero);
-
-            $this->io->title('Tasks');
-            $this->tablelizeCurrentStateOfTasks($quest->getTasks());
-
-            $this->io->section('Time get started with your quest');
-            $tasks = $this->taskRepository->findUncompletedTaskByQuest($quest);
-            foreach ($tasks as $task) {
-                $this->io->title(sprintf('You started: %s', $task));
-                $this->handleTask($task);
-
-                $this->io->info('Your progress');
-                $this->tablelizeHeroStats($hero);
-            }
-
+            $quest = $this->selectQuest($uncompletedQuests);
+            $this->showStats($quest);
+            $this->handleUncompletedTasks($quest);
+            $this->showStats($quest);
             $this->removeQuest($quest, $uncompletedQuests);
+        }
+    }
+
+    private function handleUncompletedTasks(Quest $quest): void
+    {
+        $this->io->section('Time get started with your quest');
+
+        $tasks = $this->taskRepository->findUncompletedTaskByQuest($quest);
+        foreach ($tasks as $task) {
+            $this->io->title(sprintf('You started: %s', $task));
+            $this->handleTask($task);
         }
     }
 
@@ -102,7 +96,7 @@ class HeroStartCommand extends Command
      */
     private function handleTask(Task $task): void
     {
-        while (!in_array($task->getState(), ['completed', 'failed'])) {
+        while (!in_array($task->getState(), Task::FINAL_STATES)) {
             try {
                 $workflow = $this->workflowRegistry->get($task, $task->getWorkflow());
             } catch (InvalidArgumentException $exception) {
@@ -111,9 +105,11 @@ class HeroStartCommand extends Command
                 exit;
             }
 
-            $this->io->text($workflow->getMetadataStore()->getPlaceMetadata($task->getState())['story']);
+            $placeMetadata = $workflow->getMetadataStore()->getPlaceMetadata($task->getState());
+            $this->io->text($placeMetadata['story']);
 
-            $selectedTransition = $this->selectTransition($workflow->getEnabledTransitions($task));
+            $enabledTransitions = $workflow->getEnabledTransitions($task);
+            $selectedTransition = $this->selectTransition($enabledTransitions);
             if ($selectedTransition === 'quit') {
                 $this->io->warning('Goodbye, see you next time!');
 
@@ -190,5 +186,34 @@ class HeroStartCommand extends Command
         }
 
         sort($quests);
+    }
+
+    /**
+     * @param Quest[] $choices
+     * @return Quest
+     */
+    private function selectQuest(array $choices): Quest
+    {
+        $this->io->section('Pick a quest');
+
+        $quest = $this->io->choice('Select your quest!', $choices);
+
+        $this->io->info('You have just selected: ' . $quest);
+
+        return $quest;
+    }
+
+    private function showStats(Quest $quest): void
+    {
+        $this->io->info('Your progress');
+
+        /** @var Hero $hero */
+        $hero = $quest->getHero();
+        $this->io->section('Current state of your journey');
+        $this->io->title($hero->getName() . '\'s stats');
+        $this->tablelizeHeroStats($hero);
+
+        $this->io->title('Tasks');
+        $this->tablelizeCurrentStateOfTasks($quest->getTasks());
     }
 }

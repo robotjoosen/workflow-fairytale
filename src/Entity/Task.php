@@ -8,6 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
+    public const COMPLETED_STATE = 'completed';
+    public const FAILED_STATE = 'failed';
+    public const FINAL_STATES = [
+        self::COMPLETED_STATE,
+        self::FAILED_STATE,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
