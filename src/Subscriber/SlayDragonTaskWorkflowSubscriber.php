@@ -40,8 +40,16 @@ class SlayDragonTaskWorkflowSubscriber implements EventSubscriberInterface
          * @note pick a random transition, which in this case is win or lose
          */
         $enabledTransitions = $workflow->getEnabledTransitions($task);
-        $diceRoll = mt_rand(0, count($enabledTransitions) - 1);
-        $workflow->apply($task, $enabledTransitions[$diceRoll]->getName());
+        $diceRoll = mt_rand(0, (count($enabledTransitions) - 1) * 200) / 200;
+        if ($diceRoll > 0.75 && $diceRoll < 0.25) {
+            $key = round($diceRoll);
+        } else {
+            $key = ($task->getQuest()->getHero()->getStrength() > $task->getQuest()->getHero()->getIntelligence())
+                ? floor($diceRoll)
+                : ceil($diceRoll);
+        }
+
+        $workflow->apply($task, $enabledTransitions[$key]->getName());
     }
 
     /**
